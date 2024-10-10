@@ -25,6 +25,7 @@ def DFS():
     print('DFS: ')
     stack = ArrayStack(100)
     stack.push((0, 1))
+    distance = 0
     
     while not stack.isEmpty():
         here = stack.pop()
@@ -32,13 +33,23 @@ def DFS():
         (x, y) = here
         
         if map[y][x] == 'x':
+            print(f"\n이동 거리: {distance}")
             return True
         else:
             map[y][x] = '.'
-            if isValidPos(x, y - 1): stack.push((x, y - 1))
-            if isValidPos(x, y + 1): stack.push((x, y + 1))
-            if isValidPos(x - 1, y): stack.push((x - 1, y))
-            if isValidPos(x + 1, y): stack.push((x + 1, y))
+            map[y][x] = '.'
+            if isValidPos(x, y - 1):
+                stack.push((x, y - 1))
+                distance += 1
+            if isValidPos(x, y + 1):
+                stack.push((x, y + 1))
+                distance += 1
+            if isValidPos(x - 1, y):
+                stack.push((x - 1, y))
+                distance += 1
+            if isValidPos(x + 1, y):
+                stack.push((x + 1, y))
+                distance += 1
         print("현재스택: ", stack)
     
     return False
@@ -49,5 +60,7 @@ if result:
 else: 
     print("미로탐색 실패")
 
+
+    
 
     
