@@ -1,0 +1,233 @@
+def selection_sort(arr):
+    comparisons, movements = 0, 0
+    n = len(arr)
+    print(f"Initial Array: {arr}")
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            comparisons += 1
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        if min_idx != i:  # 실제로 교환이 발생하는 경우에만
+            arr[i], arr[min_idx] = arr[min_idx], arr[i]
+            movements += 2  # 두 요소를 교환하므로 이동 2회
+            print(f"Step {i + 1}: {arr}")
+    return arr, comparisons, movements
+
+
+def insertion_sort(arr):
+    comparisons, movements = 0, 0
+    n = len(arr)
+    print(f"Initial Array: {arr}")
+    for i in range(1, n):
+        key = arr[i]
+        j = i - 1
+        while j >= 0:
+            comparisons += 1
+            if arr[j] > key:
+                arr[j + 1] = arr[j]  # 값을 뒤로 이동
+                movements += 1  # 뒤로 밀기 이동 카운트
+                j -= 1
+            else:
+                break
+        # key를 삽입할 때는 이동 횟수에 포함하지 않음
+        if j + 1 != i:
+            arr[j + 1] = key
+        print(f"Step {i}: {arr}")
+    return arr, comparisons, movements
+
+
+def bubble_sort(arr):
+    comparisons, movements = 0, 0
+    n = len(arr)
+    print(f"Initial Array: {arr}")
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            comparisons += 1
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                movements += 2
+                print(f"Step {i + 1}.{j + 1}: {arr}")
+    return arr, comparisons, movements
+
+
+def shell_sort(arr):
+    comparisons, movements = 0, 0
+    n = len(arr)
+    gap = n // 2
+    print(f"Initial Array: {arr}")
+    step = 1
+    while gap > 0:
+        for i in range(gap, n):
+            temp = arr[i]
+            j = i
+            while j >= gap and arr[j - gap] > temp:
+                comparisons += 1
+                arr[j] = arr[j - gap]
+                movements += 1
+                j -= gap
+            arr[j] = temp
+            movements += 1
+            print(f"Step {step}: {arr}")
+            step += 1
+        gap //= 2
+    return arr, comparisons, movements
+
+
+def heapify(arr, n, i, counters):
+    comparisons, movements = counters
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left < n:
+        comparisons += 1
+        if arr[left] > arr[largest]:
+            largest = left
+
+    if right < n:
+        comparisons += 1
+        if arr[right] > arr[largest]:
+            largest = right
+
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        movements += 2
+        print(f"Heapify: {arr}")
+        comparisons, movements = heapify(arr, n, largest, (comparisons, movements))
+
+    return comparisons, movements
+
+
+def heap_sort(arr):
+    comparisons, movements = 0, 0
+    n = len(arr)
+    print(f"Initial Array: {arr}")
+
+    for i in range(n // 2 - 1, -1, -1):
+        comparisons, movements = heapify(arr, n, i, (comparisons, movements))
+
+    for i in range(n - 1, 0, -1):
+        arr[i], arr[0] = arr[0], arr[i]
+        movements += 2
+        print(f"Extract Max: {arr}")
+        comparisons, movements = heapify(arr, i, 0, (comparisons, movements))
+
+    return arr, comparisons, movements
+
+
+def merge_sort(arr):
+    comparisons, movements = 0, 0
+    print(f"Initial Array: {arr}")
+
+    def merge(left, right):
+        nonlocal comparisons, movements
+        merged = []
+        while left and right:
+            comparisons += 1
+            if left[0] <= right[0]:
+                merged.append(left.pop(0))
+            else:
+                merged.append(right.pop(0))
+            movements += 1
+        merged.extend(left or right)
+        movements += len(left) + len(right)
+        return merged
+
+    def divide(arr):
+        if len(arr) <= 1:
+            return arr
+        mid = len(arr) // 2
+        left = divide(arr[:mid])
+        right = divide(arr[mid:])
+        merged = merge(left, right)
+        print(f"Merged: {merged}")
+        return merged
+
+    sorted_arr = divide(arr)
+    return sorted_arr, comparisons, movements
+
+
+def quick_sort(arr):
+    comparisons, movements = 0, 0
+    print(f"Initial Array: {arr}")
+
+    def quick_sort_recursive(start, end):
+        nonlocal comparisons, movements
+        if start >= end:
+            return
+        pivot = arr[end]
+        i = start - 1
+        for j in range(start, end):
+            comparisons += 1
+            if arr[j] <= pivot:
+                i += 1
+                arr[i], arr[j] = arr[j], arr[i]
+                movements += 2
+        arr[i + 1], arr[end] = arr[end], arr[i + 1]
+        movements += 2
+        print(f"Partitioned: {arr}")
+        quick_sort_recursive(start, i)
+        quick_sort_recursive(i + 2, end)
+
+    quick_sort_recursive(0, len(arr) - 1)
+    return arr, comparisons, movements
+
+
+def radix_sort(arr):
+    comparisons, movements = 0, 0
+    max_num = max(arr)
+    exp = 1
+    print(f"Initial Array: {arr}")
+    while max_num // exp > 0:
+        output = [0] * len(arr)
+        count = [0] * 10
+
+        for i in arr:
+            index = (i // exp) % 10
+            count[index] += 1
+
+        for i in range(1, 10):
+            count[i] += count[i - 1]
+
+        for i in range(len(arr) - 1, -1, -1):
+            index = (arr[i] // exp) % 10
+            output[count[index] - 1] = arr[i]
+            count[index] -= 1
+            movements += 1
+
+        for i in range(len(arr)):
+            arr[i] = output[i]
+            movements += 1
+        print(f"After Pass {exp}: {arr}")
+        exp *= 10
+    return arr, comparisons, movements
+
+
+if __name__ == "__main__":
+    algorithms = {
+        "SEL": selection_sort,
+        "INS": insertion_sort,
+        "BUB": bubble_sort,
+        "SHE": shell_sort,
+        "HEA": heap_sort,
+        "MER": merge_sort,
+        "QUI": quick_sort,
+        "RAD": radix_sort,
+    }
+
+    data = input("Please input a data list (comma-separated): ")
+    data_list = list(map(int, data.split(",")))
+
+    print("Target Sorting Algorithm List")
+    print("Selection(SEL), Insertion(INS), Bubble(BUB), Shell(SHE), Heap(HEA), Merge(MER), Quick(QUI), Radix(RAD)")
+
+    algorithm_key = input("Select sorting algorithm: ").strip().upper()
+
+    if algorithm_key in algorithms:
+        sorted_list, comparisons, movements = algorithms[algorithm_key](data_list.copy())
+        print(f">> Sorted: {', '.join(map(str, sorted_list))}")
+        print(f">> Number of Comparisons: {comparisons}")
+        print(f">> Number of Data Movements: {movements}")
+    else:
+        print("Invalid algorithm selection!")
